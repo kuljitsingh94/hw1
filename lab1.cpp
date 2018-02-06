@@ -40,7 +40,7 @@ using namespace std;
 #include <X11/keysym.h>
 #include <GL/glx.h>
 
-const int MAX_PARTICLES = 20000000;
+const int MAX_PARTICLES = 2000;
 const float GRAVITY = 0.1;
 
 //some structures
@@ -191,6 +191,16 @@ void init_opengl(void)
 
 void makeParticle(int x, int y)
 {
+	
+	for(int j=0; j<5; j++){
+	    Shape *s = &g.box[j];
+	    if (y < s->center.y + s->height &&
+		    y > s->center.y - s->height &&
+		    x > s->center.x - s->width &&
+		    x < s->center.x + s->width) {
+		return;
+	    }
+    	}
 	if (g.n >= MAX_PARTICLES)
 		return;
 	cout << "makeParticle() " << x << " " << y << endl;
@@ -238,11 +248,7 @@ void check_mouse(XEvent *e)
 			savey = e->xbutton.y;
 			int y = g.yres - e->xbutton.y;
 			for(int i=0; i<100; i++)
-			    makeParticle(e->xbutton.x, y);
-			
-
-
-
+				makeParticle(e->xbutton.x, y);
 		}
 	}
 }
@@ -282,16 +288,15 @@ void movement()
 	    //check for collision with shapes...
 	    for(int j=0; j<5; j++){
 		    Shape *s = &g.box[j];
-		    if (p->s.center.y < s->center.y + s->height &&
-			    p->s.center.y > s->center.y &&
-			    p->s.center.x > s->center.x - s->width &&
-			    p->s.center.x < s->center.x + s->width) {
+	    	    if (p->s.center.y < s->center.y + s->height &&
+		   	    p->s.center.y > s->center.y - s->height &&
+		       	    p->s.center.x > s->center.x - s->width &&
+		    	    p->s.center.x < s->center.x + s->width) {
 			p->velocity.y = -p->velocity.y;
 			p->velocity.y *= 0.5;
+			
 		    }
 	    }
-
-
 
 
 	    //check for off-screen
